@@ -1,16 +1,20 @@
 import express from 'express'
 import mongoose from 'mongoose';
-import bodyParser from 'express'
 import userRouter from './Routes/user.js'
 import productRouter from './Routes/product.js'
 import cartRouter from './Routes/cart.js'
 import addressRouter from './Routes/address.js'
 import paymentRouter from './Routes/payment.js'
 import cors from 'cors';
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const MONGO_URL = process.env.MONGO_URL;
 
 const app = express();
 
-app.use(bodyParser.json())
+app.use(express.json())
 
 app.use(cors({
   origin:true,
@@ -36,11 +40,16 @@ app.use('/api/address',addressRouter)
 // payment Router
 app.use('/api/payment',paymentRouter)
 
+const port = 3001;
+
 mongoose.connect(
-  "mongodb+srv://codesnippet02:RitvWpYMQotElP8v@cluster0.tmblrvd.mongodb.net/",{
+  MONGO_URL,{
     dbName:"MERN_E_Commerce"
   }
-).then(()=>console.log("MongoDB Connected Succssfully...!")).catch((err)=>console.log(err));
-
-const port = 1000;
-app.listen(port,()=>console.log(`Server is running on port ${port}`))
+).then(()=>{
+  console.log("MongoDB Connected Successfully...!");
+  app.listen(port,()=>console.log(`Server is running on port ${port}`))
+}).catch((err)=>{
+  console.log("MongoDB Connection Error:", err);
+  process.exit(1);
+});
