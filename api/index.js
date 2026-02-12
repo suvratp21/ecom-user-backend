@@ -16,11 +16,25 @@ const app = express();
 
 app.use(express.json())
 
-app.use(cors({
-  origin: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}))
+// Configure CORS to allow local dev and deployed frontend
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL || ''
+].filter(Boolean);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin) return next();
+  if (allowedOrigins.indexOf(origin) !== -1) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Auth,Authorization');
+  }
+  // Handle preflight
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 // home testing route
 app.get('/', (req, res) => res.json({ messge: 'This is home route' }))
