@@ -16,16 +16,11 @@ const app = express();
 
 app.use(express.json())
 
-// Configure CORS to allow local dev and deployed frontend
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.FRONTEND_URL || ''
-].filter(Boolean);
-
+// Allow any origin by echoing request origin and enabling credentials.
+// This effectively allows all origins while keeping credential support.
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (!origin) return next();
-  if (allowedOrigins.indexOf(origin) !== -1) {
+  if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');

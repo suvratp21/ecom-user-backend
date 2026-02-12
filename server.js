@@ -16,11 +16,18 @@ const app = express();
 
 app.use(express.json())
 
-app.use(cors({
-  origin:true,
-  methods:[ "GET","POST","PUT","DELETE"],
-  credentials:true
-}))
+// Allow any origin (echo) and enable credentials for local testing
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Auth,Authorization');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 // home testing route
 app.get('/',(req,res)=>res.json({messge:'This is home route'}))
